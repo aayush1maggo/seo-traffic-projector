@@ -1,167 +1,140 @@
-# Semrush MCP Server
+# SEO Traffic Projection by Aayush
 
-A Model Context Protocol (MCP) server implementation that provides tools for accessing Semrush API data.
+A professional Python tool for projecting organic traffic growth based on keyword rankings and historical performance data.
 
 ## Features
 
-The Semrush MCP server provides tools for:
+- **Traffic Projection**: Generate 6-month traffic projections using three scenarios (Conservative, Realistic, Optimistic)
+- **Multiple Data Sources**: Support for Google Search Console API and CSV uploads
+- **Keyword Analysis**: Calculate potential traffic from target keyword rankings
+- **Professional Web Interface**: Streamlit app with modern, professional design
+- **Excel/CSV Export**: Download detailed reports in multiple formats
+- **Mathematical Modeling**: Based on CTR curves, SERP share, and seasonality factors
 
-- **Domain Analytics**
-  - Domain overview information
-  - Organic and paid keywords analysis
-  - Competitor analysis
+## Quick Start
 
-- **Keyword Analytics**
-  - Keyword overview data
-  - Related keyword discovery
+### Option 1: Streamlit Web App (Recommended)
 
-- **Backlink Analysis**
-  - Backlink data
-  - Referring domains analysis
-
-- **Traffic Analytics**
-  - Traffic summary for domains
-  - Traffic sources analysis
-  - (Note: Requires .Trends API subscription)
-
-## Setup
-
-1. Clone the repository
-2. Install dependencies:
+1. Install dependencies:
    ```bash
-   npm install
+   pip install -r requirements.txt
    ```
-3. Create a `.env` file with your Semrush API key:
-   ```
-   SEMRUSH_API_KEY=your_api_key_here
-   ```
-4. Build the project:
+
+2. Run the Streamlit app:
    ```bash
-   npm run build
+   streamlit run streamlit_app.py
    ```
-5. Start the server:
+
+3. Open your browser and go to `http://localhost:8501`
+
+### Option 2: Command Line Tool
+
+1. Install dependencies:
    ```bash
-   npm run start
+   pip install -r requirements.txt
    ```
 
-## Environment Variables
+2. Run the analysis:
+   ```bash
+   python final_integration.py
+   ```
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `SEMRUSH_API_KEY` | Your Semrush API key | (Required) |
-| `API_CACHE_TTL_SECONDS` | Time to cache API responses | 300 |
-| `API_RATE_LIMIT_PER_SECOND` | Maximum API requests per second | 10 |
-| `NODE_ENV` | Environment (development/production) | development |
-| `PORT` | Server port | 3000 |
-| `LOG_LEVEL` | Logging level | info |
+## Data Requirements
 
-## Available Tools
+### Google Search Console Data
+CSV file with columns:
+- `date`: Date in YYYY-MM-DD format
+- `clicks`: Number of clicks (required)
+- `impressions`: Number of impressions (optional)
 
-| Tool Name | Description | Required Parameters |
-|-----------|-------------|---------------------|
-| `semrush_domain_overview` | Get domain overview data | domain, [database] |
-| `semrush_domain_organic_keywords` | Get organic keywords for domain | domain, [database], [limit] |
-| `semrush_domain_paid_keywords` | Get paid keywords for domain | domain, [database], [limit] |
-| `semrush_competitors` | Get organic search competitors | domain, [database], [limit] |
-| `semrush_backlinks` | Get backlinks for a domain/URL | target, [limit] |
-| `semrush_backlinks_domains` | Get referring domains | target, [limit] |
-| `semrush_keyword_overview` | Get keyword overview data | keyword, [database] |
-| `semrush_related_keywords` | Find related keywords | keyword, [database], [limit] |
-| `semrush_keyword_overview_single_db` | Get detailed keyword data for specific database | keyword, database |
-| `semrush_batch_keyword_overview` | Analyze up to 100 keywords at once | keywords, database |
-| `semrush_keyword_organic_results` | Get domains ranking in organic results | keyword, database, [limit] |
-| `semrush_keyword_paid_results` | Get domains in paid search results | keyword, database, [limit] |
-| `semrush_keyword_ads_history` | Get 12-month history of domains bidding on keyword | keyword, database, [limit] |
-| `semrush_broad_match_keywords` | Get broad matches and alternate search queries | keyword, database, [limit] |
-| `semrush_phrase_questions` | Get question-based keywords | keyword, database, [limit] |
-| `semrush_keyword_difficulty` | Get difficulty index for ranking in top 10 | keywords, database |
-| `semrush_traffic_summary` | Get traffic summary data for domains | domains, [country] |
-| `semrush_traffic_sources` | Get traffic sources data | domain, [country] |
-| `semrush_api_units_balance` | Check API units balance | check: true |
+### Keywords Data
+CSV file with columns:
+- `keyword`: Target keyword
+- `target_rank`: Target ranking position (1-10)
+- `serp_share`: Expected share of SERP clicks (0.0-1.0)
+- `seasonality`: Seasonal factor (0.5-2.0)
+- `search_volume`: Monthly search volume
 
-Parameters in [brackets] are optional.
+## Mathematical Model
 
-## API Units Consumption
+The tool uses a sophisticated mathematical model:
 
-API requests to Semrush consume API units from your account. Different types of requests have different costs. You can check your API units balance using the `semrush_api_units_balance` tool.
+1. **Baseline Calculation**: Average monthly clicks from historical GSC data
+2. **Steady-State Clicks**: `Search Volume × CTR × SERP Share × Seasonality`
+3. **Ramp Curve**: Gradual traffic growth over 6 months (25% → 100%)
+4. **CTR Curves**: Position-based click-through rates for three scenarios
 
-### Keyword Reports API Units Consumption
+### CTR Curves (Default)
+- **Conservative**: Position 1: 20%, Position 3: 8%, Position 5: 5%
+- **Realistic**: Position 1: 28%, Position 3: 11%, Position 5: 8%
+- **Optimistic**: Position 1: 32%, Position 3: 14%, Position 5: 9%
 
-| Tool | API Units per Line |
-|------|-------------------|
-| `semrush_keyword_overview` | 10 |
-| `semrush_keyword_overview_single_db` | 10 |
-| `semrush_batch_keyword_overview` | 10 |
-| `semrush_keyword_organic_results` | 10 |
-| `semrush_keyword_paid_results` | 20 |
-| `semrush_related_keywords` | 40 |
-| `semrush_keyword_ads_history` | 100 |
-| `semrush_broad_match_keywords` | 20 |
-| `semrush_phrase_questions` | 40 |
-| `semrush_keyword_difficulty` | 50 |
+### Ramp Curve (Default)
+- Month 1: 25% of steady-state potential
+- Month 2: 50% of steady-state potential
+- Month 3: 75% of steady-state potential
+- Month 4: 90% of steady-state potential
+- Month 5-6: 100% of steady-state potential
 
-## Adding to Cursor or Claude
+## Files Structure
 
-To add this MCP server to Cursor or Claude:
+- `streamlit_app.py`: Main Streamlit web application
+- `final_integration.py`: Command-line version of the tool
+- `requirements.txt`: Python dependencies
+- `test_calculations.py`: Unit tests for calculations
+- `demo_calculations.py`: Step-by-step calculation demonstration
+- `README_STREAMLIT.md`: Detailed Streamlit app documentation
 
-### Cursor
+## Dependencies
 
-1. In Cursor, go to Settings > MCP Servers
-2. Click "Add Server"
-3. Configure the server with the following settings:
-   - **Name**: `Semrush MCP` (or any name you prefer)
-   - **Type**: `command`
-   - **Command**: `node`
-   - **Arguments**: `/path/to/semrush-mcp/dist/index.js` (replace with your actual path)
-   - **Environment Variables**:
-     - `SEMRUSH_API_KEY`: Your Semrush API key
-     - Other optional variables as needed
-4. Click "Save"
+Required:
+- `streamlit`: Web application framework
+- `pandas`: Data manipulation
+- `numpy`: Numerical operations
+- `matplotlib`: Basic plotting
+- `plotly`: Interactive charts
 
-## Usage Using NPX
+Optional:
+- `xlsxwriter` or `openpyxl`: Excel export functionality
+- `google-auth`, `google-api-python-client`: Google Search Console API
+- `requests`: SEMrush API integration
 
-### Using Environment Variables in Cursor/Claude/Windsurf Configuration
+## Testing
 
-Configure your MCP servers JSON file for your designated consuming environment by adding this MCP using the following format:
-
-```json
-{
-  "mcpServers": {
-    "semrush-mcp": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "github:mrkooblu/semrush-mcp"
-      ],
-      "env": {
-        "SEMRUSH_API_KEY": "your-api-key",
-        "LOG_LEVEL": "info"
-      }
-    }
-  }
-}
-```
-
-Running it from your terminal:
-
+Run the test suite to verify calculations:
 ```bash
-SEMRUSH_API_KEY=your-api-key npx -y github:mrkooblu/semrush-mcp
+python test_calculations.py
 ```
 
-## Development
-
-To run the server in development mode:
-
+View step-by-step calculations:
 ```bash
-npm run dev
+python demo_calculations.py
 ```
 
-## Security Notes
+## Configuration
 
-- Never share your Semrush API key publicly
-- API key provides access to your API units balance
-- Exposing credentials can lead to unauthorized API usage and unexpected charges
+The tool allows customization of:
+- Baseline calculation period (1-12 months)
+- CTR curves for different positions
+- Ramp curve percentages
+- Target keyword parameters
+
+## Output
+
+The tool generates:
+- Interactive traffic growth charts
+- Detailed projection tables
+- Excel/CSV reports
+- Keywords analysis breakdown
 
 ## License
 
-[MIT](./LICENSE) 
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Author
+
+**Aayush Maggo** - Professional SEO Traffic Projection Tool
+
+---
+
+For detailed usage instructions, see `README_STREAMLIT.md`.
